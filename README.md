@@ -1,20 +1,22 @@
-# Nostr Key Bridge
+# ⚡🔒 Nostr Key Ceremony
 
-⚡🔒 **Master key + revocable sub-keys (NIP-26 delegation)**
+**Generate your nostr keys with intention**
 
-A self-hosted, zero-server tool for managing nostr keys with delegation. Create sub-keys for apps that can sign as you, but revoke them anytime.
+A beautiful, ceremonial key generation experience for nostr. Collect entropy, watch your key being forged, and secure it with encrypted backups.
+
+**[Try it now →](https://plutarchsecho.github.io/nostr-KeyBridge)**
 
 ---
 
-## 🎯 What It Does
+## ✨ Features
 
-| Feature | Benefit |
-|---------|---------|
-| **Master Key** | Your root identity, kept secret |
-| **Sub-Keys** | Give to apps, they sign as you |
-| **Revocation** | Compromised? Revoke instantly |
-| **Zero Server** | Everything in your browser |
-| **Self-Hosted** | You control the code |
+| Feature | What It Does |
+|---------|-------------|
+| **Entropy Collection** | Move mouse, type random keys, or auto-fill to add your randomness |
+| **Visual Mining** | Watch secp256k1 elliptic curve cryptography in action |
+| **Encrypted Backups** | AES-256-GCM encryption with PBKDF2 password derivation |
+| **Remote Signer Links** | Direct links to NIP-46 bunkers for secure signing |
+| **Self-Hosted** | One HTML file, zero server, you control everything |
 
 ---
 
@@ -39,28 +41,59 @@ Wait 1-2 minutes, then visit:
 https://yourname.github.io/nostr-key-bridge
 ```
 
-**Done!** Your own instance is live.
+**Done!** Your own ceremony is live.
+
+---
+
+## 🎭 The Ceremony
+
+### Step 1: Provide Entropy
+Move your mouse, type random characters, or click auto-fill. Your randomness makes the key truly yours.
+
+### Step 2: Watch Mining
+Visual animation of secp256k1 key generation. 256 bits of entropy forged into your unique identity.
+
+### Step 3: Reveal & Backup
+Your nsec appears with ritual solemnity. Download encrypted backup (with password) or plain JSON. Links to NIP-46 remote signers included.
+
+---
+
+## 🔐 Security
+
+### Encrypted Backups
+- **Algorithm:** AES-256-GCM
+- **Key Derivation:** PBKDF2 with 100,000 iterations
+- **Format:** JSON with base64-encoded salt, IV, and ciphertext
+
+### What the Host Sees
+| Data | Visible? |
+|------|----------|
+| Your keys | ❌ No (never leaves your browser) |
+| Your password | ❌ No (only used for encryption) |
+| IP address | ✅ Yes (standard web) |
+
+**Self-host if you don't want GitHub seeing your IP patterns.**
+
+---
+
+## 🔗 Remote Signers (NIP-46)
+
+Never expose your nsec to apps again. Use these bunkers:
+
+- **[nsecBunker.com](https://nsecbunker.com)** — Hosted bunker service
+- **[Nostr Connect](https://github.com/nostr-connect/nostr-connect)** — Protocol spec
+- **[Blowater](https://git.njump.io/fiatjaf/blowater)** — Self-hosted option
 
 ---
 
 ## 🏠 Self-Hosting Options
 
-### Option A: Netlify (Free, Drag & Drop)
-
+### Netlify (Drag & Drop)
 1. Go to https://app.netlify.com/drop
 2. Drag `index.html` onto the page
-3. Get instant URL
+3. Get instant HTTPS URL
 
-### Option B: Vercel (Free, CLI)
-
-```bash
-npm i -g vercel
-vercel --prod
-```
-
-### Option C: Your Own Server
-
-**Nginx:**
+### Your Own Server (Nginx)
 ```nginx
 server {
     listen 443 ssl;
@@ -74,79 +107,19 @@ server {
 }
 ```
 
-**Get SSL:**
+Get free SSL:
 ```bash
 sudo certbot --nginx -d keys.yourdomain.com
 ```
 
 ---
 
-## 🔐 Security
-
-### What the Host Sees
-
-| Data | Visible? |
-|------|----------|
-| Your keys | ❌ No (encrypted in browser) |
-| Your PIN | ❌ No (never sent) |
-| IP address | ✅ Yes (standard web) |
-
-**Self-host if you don't want GitHub seeing your IP patterns.**
-
-### Code Verification
-
-```bash
-# Download and inspect
-curl -o nostr-key-bridge.html https://yourname.github.io/nostr-key-bridge/index.html
-
-# Check no external requests
-grep -E "fetch\|XMLHttpRequest\|WebSocket" nostr-key-bridge.html
-# Should return nothing
-```
-
-**Fully auditable.** No minification, plain readable JavaScript.
-
----
-
-## 📖 Usage
-
-### Create Master Key
-1. Set PIN (8+ digits)
-2. Download backup JSON
-3. Store securely
-
-### Create Sub-Key
-1. Enter app name
-2. Enter master PIN
-3. Copy sub-key nsec to app
-4. App can now sign as you
-
-### Revoke Sub-Key
-1. Go to "Manage Sub-Keys"
-2. Click "Revoke" on compromised key
-3. Create new sub-key for app
-
-### Restore
-- **From JSON:** Paste backup + PIN
-- **From nsec:** Paste nsec + new PIN
-
----
-
 ## 🎨 Branding
 
 Visual identity:
-- ⚡🔒 Lightning + Padlock icon
+- ⚡🔒 Lightning + Padlock icon (from Lightning Lockers)
 - Electric blue (#00d4ff) + Bitcoin orange (#ff9500)
-- Clean, minimal UI
-
----
-
-## 🤝 Contributing
-
-1. Fork the repo
-2. Make changes
-3. Test locally
-4. Submit PR
+- Dark theme with glow effects
 
 ---
 
@@ -158,10 +131,9 @@ MIT — Open source, no restrictions.
 
 ## 🔗 Links
 
-- **Live Demo:** https://yourname.github.io/nostr-key-bridge
-- **Nostr:** `npub1...` (your npub)
+- **Live Demo:** https://plutarchsecho.github.io/nostr-KeyBridge
 - **Issues:** GitHub Issues
 
 ---
 
-**Built for sovereignty. Designed for humans.** 🦞
+**Generate with intention. Guard with your life.** 🦞

@@ -270,6 +270,95 @@
       text-decoration: none;
     }
     
+    /* Password Input */
+    .password-section {
+      background: #151530;
+      border: 1px solid #2a3a5a;
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 1rem 0;
+      text-align: left;
+    }
+    
+    .password-section label {
+      display: block;
+      color: #88aacc;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .password-section input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #2a3a5a;
+      border-radius: 8px;
+      background: #0a0a15;
+      color: #e0f0ff;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .password-section input:focus {
+      border-color: #00d4ff;
+      outline: none;
+    }
+    
+    /* Remote Signers Section */
+    .signer-section {
+      background: linear-gradient(135deg, #151530 0%, #1a1a3a 100%);
+      border: 1px solid #2a3a5a;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+    
+    .signer-title {
+      color: #00d4ff;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .signer-desc {
+      color: #88aacc;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    
+    .signer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .signer-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: #0a0a15;
+      border: 1px solid #2a3a5a;
+      border-radius: 8px;
+      color: #e0f0ff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    
+    .signer-link:hover {
+      border-color: #00d4ff;
+      background: rgba(0, 212, 255, 0.1);
+    }
+    
+    .signer-icon {
+      font-size: 1.2rem;
+    }
+    
     /* Confetti */
     .confetti {
       position: fixed;
@@ -370,10 +459,23 @@
         </div>
       </div>
       
+      <!-- Password Protected Backup -->
+      <div class="password-section">
+        <label>Set a password to encrypt your backup</label>
+        <input type="password" id="backupPassword" placeholder="Strong password (12+ chars recommended)" oninput="checkPassword()">
+        <div style="color: #88aacc; font-size: 0.75rem; margin-top: 0.25rem;">
+          Encryption: PBKDF2 + AES-256-GCM
+        </div>
+      </div>
+
       <div class="backup-grid">
-        <div class="backup-card" onclick="downloadBackup()">
+        <div class="backup-card" onclick="downloadEncryptedBackup()">
+          <div class="backup-icon">🔐</div>
+          <div class="backup-label">Download Encrypted</div>
+        </div>
+        <div class="backup-card" onclick="downloadPlainBackup()">
           <div class="backup-icon">💾</div>
-          <div class="backup-label">Download JSON</div>
+          <div class="backup-label">Download Plain</div>
         </div>
         <div class="backup-card" onclick="copyNsec()">
           <div class="backup-icon">📋</div>
@@ -383,9 +485,27 @@
           <div class="backup-icon">👤</div>
           <div class="backup-label">Copy npub</div>
         </div>
-        <div class="backup-card" onclick="window.print()">
-          <div class="backup-icon">🖨️</div>
-          <div class="backup-label">Print Backup</div>
+      </div>
+
+      <!-- Remote Signers -->
+      <div class="signer-section">
+        <div class="signer-title">🔐 Remote Signers (NIP-46)</div>
+        <div class="signer-desc">
+          Never expose your nsec to apps again. Use these bunkers to keep your key secure while signing remotely.
+        </div>
+        <div class="signer-links">
+          <a href="https://nsecbunker.com" target="_blank" class="signer-link">
+            <span class="signer-icon">⚡</span>
+            <span>nsecBunker.com</span>
+          </a>
+          <a href="https://github.com/nostr-connect/nostr-connect" target="_blank" class="signer-link">
+            <span class="signer-icon">🔗</span>
+            <span>Nostr Connect (protocol)</span>
+          </a>
+          <a href="https://git.njump.io/fiatjaf/blowater" target="_blank" class="signer-link">
+            <span class="signer-icon">💨</span>
+            <span>Blowater (self-hosted)</span>
+          </a>
         </div>
       </div>
       
@@ -399,7 +519,24 @@
       <button class="btn btn-primary hidden" id="finishBtn" onclick="finishCeremony()">Complete Ceremony</button>
     </div>
     
-    <!-- STEP 4: Complete -->
+    <!-- STEP 4: Restore (Hidden by default) -->
+    <div id="step-restore" class="step">
+      <h1 style="margin-bottom: 1rem;">Restore Key</h1>
+      <p class="subtitle" style="margin-bottom: 1.5rem;">Decrypt your encrypted backup</p>
+      
+      <div class="password-section">
+        <label>Paste encrypted backup JSON</label>
+        <textarea id="restoreData" rows="6" placeholder="Paste your encrypted backup here..." style="width: 100%; background: #0a0a15; color: #e0f0ff; border: 2px solid #2a3a5a; border-radius: 8px; padding: 0.75rem; font-family: monospace; font-size: 0.8rem; margin-bottom: 1rem;"></textarea>
+        
+        <label>Decryption password</label>
+        <input type="password" id="restorePassword" placeholder="Enter the password you set..." style="width: 100%; background: #0a0a15; color: #e0f0ff; border: 2px solid #2a3a5a; border-radius: 8px; padding: 0.75rem;">
+      </div>
+      
+      <button class="btn btn-primary" onclick="restoreEncrypted()">Decrypt & Restore</button>
+      <button class="btn btn-secondary" onclick="showStep('step-intro')">Cancel</button>
+    </div>
+    
+    <!-- STEP 5: Complete -->
     <div id="step-complete" class="step">
       <div class="completion-message">
         <div class="completion-icon">⚡🔒</div>
@@ -414,6 +551,7 @@
       </p>
       
       <button class="btn btn-secondary" onclick="location.reload()">Generate Another Key</button>
+      <button class="btn btn-secondary" onclick="showStep('step-restore')">Restore from Backup</button>
       
       <div class="footer">
         Share your ceremony: <span id="shareUrl"></span>
@@ -533,8 +671,81 @@
       }
     }
     
+    // === CRYPTO FUNCTIONS ===
+    async function deriveKey(password, salt) {
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+      return crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+      );
+    }
+
+    async function encryptData(data, password) {
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const key = await deriveKey(password, salt);
+      const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(data));
+      return {
+        v: 1,
+        salt: btoa(String.fromCharCode(...salt)),
+        iv: btoa(String.fromCharCode(...iv)),
+        ct: btoa(String.fromCharCode(...new Uint8Array(ct)))
+      };
+    }
+
+    function checkPassword() {
+      const pwd = document.getElementById('backupPassword').value;
+      // Just visual feedback - actual encryption happens on download
+    }
+
     // === STEP 3: Backup Actions ===
-    function downloadBackup() {
+    async function downloadEncryptedBackup() {
+      if (!generatedKey) return;
+      
+      const password = document.getElementById('backupPassword').value;
+      if (!password) {
+        alert('Please enter a password to encrypt your backup');
+        document.getElementById('backupPassword').focus();
+        return;
+      }
+      
+      const backupData = JSON.stringify({
+        nsec: generatedKey.nsec,
+        npub: generatedKey.npub,
+        created: generatedKey.created
+      });
+      
+      try {
+        const encrypted = await encryptData(backupData, password);
+        const backup = {
+          v: 1,
+          encrypted: true,
+          data: encrypted,
+          npub: generatedKey.npub,
+          created: generatedKey.created,
+          _warning: 'ENCRYPTED BACKUP. PASSWORD REQUIRED TO DECRYPT.'
+        };
+        
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `nostr-key-encrypted-${generatedKey.npub.slice(0, 16)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        createConfetti();
+      } catch (err) {
+        console.error('Encryption failed:', err);
+        alert('Encryption failed. Please try again.');
+      }
+    }
+
+    function downloadPlainBackup() {
       if (!generatedKey) return;
       
       const backup = {
@@ -554,7 +765,6 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      // Visual feedback
       createConfetti();
     }
     
@@ -575,6 +785,72 @@
     function checkConfirm() {
       const checked = document.getElementById('confirmBackup').checked;
       document.getElementById('finishBtn').classList.toggle('hidden', !checked);
+    }
+    
+    // === RESTORE FUNCTIONS ===
+    async function decryptData(encrypted, password) {
+      const salt = Uint8Array.from(atob(encrypted.salt), c => c.charCodeAt(0));
+      const iv = Uint8Array.from(atob(encrypted.iv), c => c.charCodeAt(0));
+      const ct = Uint8Array.from(atob(encrypted.ct), c => c.charCodeAt(0));
+      
+      const key = await deriveKey(password, salt);
+      const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+      return new TextDecoder().decode(decrypted);
+    }
+    
+    async function restoreEncrypted() {
+      const data = document.getElementById('restoreData').value.trim();
+      const password = document.getElementById('restorePassword').value;
+      
+      if (!data || !password) {
+        alert('Please paste your backup and enter the password');
+        return;
+      }
+      
+      try {
+        const backup = JSON.parse(data);
+        
+        if (!backup.encrypted || !backup.data) {
+          // Plain text backup
+          if (backup.nsec && backup.nsec.startsWith('nsec1')) {
+            generatedKey = {
+              nsec: backup.nsec,
+              npub: backup.npub,
+              created: backup.created
+            };
+            document.getElementById('nsecDisplay').textContent = generatedKey.nsec;
+            document.getElementById('npubDisplay').textContent = 'Public: ' + generatedKey.npub;
+            document.getElementById('restoreData').value = '';
+            document.getElementById('restorePassword').value = '';
+            showStep('step-reveal');
+            alert('Plain backup restored! No decryption needed.');
+            return;
+          }
+          throw new Error('Invalid backup format');
+        }
+        
+        // Encrypted backup
+        const decrypted = await decryptData(backup.data, password);
+        const keyData = JSON.parse(decrypted);
+        
+        generatedKey = {
+          nsec: keyData.nsec,
+          npub: keyData.npub,
+          created: keyData.created
+        };
+        
+        document.getElementById('nsecDisplay').textContent = generatedKey.nsec;
+        document.getElementById('npubDisplay').textContent = 'Public: ' + generatedKey.npub;
+        document.getElementById('restoreData').value = '';
+        document.getElementById('restorePassword').value = '';
+        
+        showStep('step-reveal');
+        alert('Backup restored successfully!');
+        
+      } catch (err) {
+        console.error('Restore failed:', err);
+        alert('Decryption failed. Wrong password or invalid backup.');
+      }
     }
     
     function finishCeremony() {
