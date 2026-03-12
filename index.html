@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>⚡ Nostr Key Bridge — Powered by Lightning Lockers</title>
+  <script src="https://unpkg.com/nostr-tools@2.10.4/lib/nostr.bundle.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, sans-serif; background: #0a0a1a; color: #e0f0ff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
@@ -177,9 +178,12 @@
     }
 
     function generateKey() {
-      const b = crypto.getRandomValues(new Uint8Array(32));
-      const h = Array.from(b).map(x => x.toString(16).padStart(2,'0')).join('');
-      return {nsec: 'nsec1' + h.slice(0,58), npub: 'npub1' + h.slice(0,58)};
+      // Use real secp256k1 via nostr-tools
+      const sk = window.NostrTools.generateSecretKey();
+      const pk = window.NostrTools.getPublicKey(sk);
+      const nsec = window.NostrTools.nip19.nsecEncode(sk);
+      const npub = window.NostrTools.nip19.npubEncode(pk);
+      return {nsec, npub, sk, pk};
     }
 
     // === UI ===
