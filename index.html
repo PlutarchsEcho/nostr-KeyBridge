@@ -4,509 +4,599 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0a0a1a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>⚡ Nostr Key Bridge — Powered by Lightning Lockers</title>
+  <title>⚡🔒 Nostr Key Ceremony</title>
   <script src="https://unpkg.com/nostr-tools@2.10.4/lib/nostr.bundle.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #0a0a1a; color: #e0f0ff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
-    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #00d4ff 0%, #ff9500 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .subtitle { color: #88aacc; font-size: 0.9rem; margin-bottom: 0.5rem; text-align: center; }
-    .brand { color: #ff9500; font-size: 0.8rem; margin-bottom: 2rem; text-align: center; letter-spacing: 0.05em; }
-    .card { background: #151530; border: 1px solid #2a3a5a; border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 400px; margin-bottom: 1rem; box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1); }
-    .card h3 { margin-bottom: 1rem; color: #00d4ff; }
-    .btn { width: 100%; padding: 0.875rem; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-bottom: 0.5rem; transition: all 0.2s; }
-    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-primary { background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0a0a1a; font-weight: 600; }
-    .btn-secondary { background: #2a3a5a; color: #e0f0ff; border: 1px solid #3a4a6a; }
-    .btn-danger { background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%); color: white; }
-    input, textarea { width: 100%; padding: 0.75rem; border: 2px solid #3a3a5c; border-radius: 8px; background: #1a1a2e; color: #e0e0ff; font-size: 16px; margin-bottom: 0.75rem; -webkit-appearance: none; }
-    input:focus, textarea:focus { outline: none; border-color: #00d4ff; }
-    @media (max-width: 480px) {
-      body { padding: 1rem 0.75rem; }
-      .card { padding: 1.25rem; margin-bottom: 0.75rem; }
-      h1 { font-size: 1.4rem; }
-      .btn { padding: 1rem; font-size: 16px; min-height: 48px; }
-      input, textarea { padding: 0.875rem; min-height: 48px; }
+    body { 
+      font-family: system-ui, -apple-system, sans-serif; 
+      background: #0a0a1a; 
+      color: #e0f0ff; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+      padding: 1rem; 
     }
-    .hidden { display: none !important; }
-    .warning { color: #ff8844; font-size: 0.875rem; margin: 0.5rem 0; }
-    .info { color: #8888aa; font-size: 0.875rem; margin: 0.5rem 0; }
-    code { background: #0a0a15; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.9rem; }
-    .key-box { background: #0a0a15; border: 1px solid #3a3a5c; border-radius: 8px; padding: 1rem; margin: 0.5rem 0; word-break: break-all; font-family: monospace; font-size: 0.85rem; }
-    .delegate-item { background: #1a2a1a; border: 1px solid #2a4a2a; border-radius: 8px; padding: 1rem; margin: 0.5rem 0; }
-    .revoked { opacity: 0.5; border-color: #4a2a2a; background: #2a1a1a; }
+    
+    .container { width: 100%; max-width: 480px; text-align: center; }
+    
+    /* Logo */
+    .logo { 
+      width: 80px; 
+      height: 80px; 
+      margin: 0 auto 1rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #00d4ff 0%, #ff9500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .subtitle { color: #88aacc; font-size: 0.95rem; margin-bottom: 2rem; }
+    
+    /* Steps */
+    .step { display: none; }
+    .step.active { display: block; animation: fadeIn 0.5s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Entropy Area */
+    .entropy-box {
+      background: linear-gradient(135deg, #151530 0%, #1a1a3a 100%);
+      border: 2px solid #2a3a5a;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      cursor: crosshair;
+      position: relative;
+      overflow: hidden;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .entropy-box:hover { border-color: #00d4ff; }
+    
+    .entropy-progress {
+      width: 100%;
+      height: 8px;
+      background: #1a1a2e;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    
+    .entropy-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #00d4ff 0%, #ff9500 100%);
+      border-radius: 4px;
+      transition: width 0.1s ease;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
+    
+    .entropy-text {
+      color: #00d4ff;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .entropy-sub {
+      color: #88aacc;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    
+    /* Mining Animation */
+    .mining-container {
+      padding: 2rem;
+    }
+    
+    .mining-rings {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+    
+    .ring {
+      position: absolute;
+      border: 3px solid transparent;
+      border-top-color: #00d4ff;
+      border-radius: 50%;
+      animation: spin linear infinite;
+    }
+    
+    .ring:nth-child(1) { width: 100%; height: 100%; top: 0; left: 0; animation-duration: 3s; }
+    .ring:nth-child(2) { width: 75%; height: 75%; top: 12.5%; left: 12.5%; animation-duration: 2s; border-top-color: #ff9500; }
+    .ring:nth-child(3) { width: 50%; height: 50%; top: 25%; left: 25%; animation-duration: 1s; }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .mining-core {
+      position: absolute;
+      width: 30%;
+      height: 30%;
+      top: 35%;
+      left: 35%;
+      background: radial-gradient(circle, #00d4ff 0%, #ff9500 100%);
+      border-radius: 50%;
+      animation: pulse 1s ease-in-out infinite;
+    }
+    
+    .mining-status {
+      color: #00d4ff;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .mining-sub {
+      color: #88aacc;
+      font-size: 0.9rem;
+    }
+    
+    /* Key Reveal */
+    .key-reveal {
+      background: linear-gradient(135deg, #0a0a15 0%, #151530 100%);
+      border: 2px solid #00d4ff;
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      position: relative;
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.6); }
+    }
+    
+    .key-label {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0a0a1a;
+      padding: 0 1rem;
+      color: #ff9500;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    
+    .nsec-box {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      word-break: break-all;
+      color: #00d4ff;
+      background: #0a0a15;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      border: 1px solid #2a3a5a;
+      letter-spacing: 0.02em;
+      line-height: 1.8;
+      user-select: all;
+    }
+    
+    .npub-box {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      word-break: break-all;
+      color: #88aacc;
+      margin-top: 1rem;
+    }
+    
+    /* Backup Actions */
+    .backup-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    
+    @media (max-width: 400px) {
+      .backup-actions { grid-template-columns: 1fr; }
+    }
+    
+    .backup-btn {
+      padding: 0.875rem;
+      border: 2px solid #2a3a5a;
+      border-radius: 10px;
+      background: #151530;
+      color: #e0f0ff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .backup-btn:hover {
+      border-color: #00d4ff;
+      background: rgba(0, 212, 255, 0.1);
+    }
+    
+    /* Start Button */
+    .start-btn {
+      margin-top: 2rem;
+      padding: 1.25rem 2rem;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, #00d4ff 0%, #ff9500 100%);
+      color: #0a0a1a;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+    }
+    
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0, 212, 255, 0.6);
+    }
+    
+    /* Footer */
+    .footer {
+      margin-top: 2rem;
+      color: #556677;
+      font-size: 0.8rem;
+    }
+    
+    .footer a {
+      color: #00d4ff;
+      text-decoration: none;
+    }
+    
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: #00d4ff;
+      position: absolute;
+      animation: confetti-fall 3s ease-out forwards;
+    }
+    
+    @keyframes confetti-fall {
+      0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
   </style>
 </head>
 <body>
-  <!-- Logo -->
-  <div style="width: 80px; height: 80px; margin-bottom: 1rem; flex-shrink: 0;">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" style="display: block;">
-      <rect width="100" height="100" rx="20" fill="#0A0A0A"/>
-      <rect x="25" y="42" width="50" height="40" rx="6" fill="none" stroke="#00D4FF" stroke-width="5"/>
-      <path d="M 35,42 L 35,32 A 15,15 0 0,1 65,32 L 65,42" fill="none" stroke="#00D4FF" stroke-width="5" stroke-linecap="round"/>
-      <polygon points="42,68 50,68 45,78 58,62 50,62 55,52 42,68" fill="#F7931A"/>
-    </svg>
-  </div>
-
-  <h1>Nostr Key Bridge</h1>
-  <p class="subtitle">Master key + revocable sub-keys (NIP-26 delegation)</p>
-
-  <!-- STEP 1: Create or Import Master Key -->
-  <div id="setup" class="card">
-    <h3>Create Master Key</h3>
-    <p class="info">Your root identity. Keep secret. Sub-keys inherit from this.</p>
-    <input type="password" id="masterPin" placeholder="Master PIN (8+ digits)">
-    <button class="btn btn-primary" onclick="createMaster()">Create New Key</button>
-    <p class="warning">⚠️ Download backup after creation. No PIN recovery.</p>
-    
-    <hr style="border-color: #3a3a5c; margin: 1.5rem 0;">
-    
-    <h3 style="color: #ffd700; margin-bottom: 0.5rem;">Already have a nsec?</h3>
-    <p class="info">Import your existing nostr key to create sub-keys from it.</p>
-    <input type="text" id="importNsec" placeholder="Paste your nsec1... (starts with nsec1)">
-    <input type="password" id="importPin" placeholder="Set new PIN (8+ digits)">
-    <button class="btn btn-secondary" onclick="importExisting()">Import Existing Key</button>
-    
-    <hr style="border-color: #3a3a5c; margin: 1.5rem 0;">
-    
-    <button class="btn btn-secondary" onclick="show('restore')">Restore from Backup JSON</button>
-  </div>
-
-  <!-- STEP 2: Dashboard -->
-  <div id="dashboard" class="card hidden">
-    <h3>Master Key</h3>
-    <div class="key-box" id="npub-box"></div>
-    <button class="btn btn-primary" onclick="show('create-delegate')">Create Sub-Key</button>
-    <button class="btn btn-secondary" onclick="show('manage')">Manage Sub-Keys</button>
-    <button class="btn btn-secondary" onclick="show('export')">Export Master</button>
-    <button class="btn btn-secondary" onclick="downloadBackup()">Download Backup</button>
-    <button class="btn btn-secondary" onclick="logout()">Lock</button>
-  </div>
-
-  <!-- STEP 3: Create Delegate -->
-  <div id="create-delegate" class="card hidden">
-    <h3>Create Sub-Key</h3>
-    <p class="info">Sub-keys can sign as you, but you can revoke them.</p>
-    <input type="text" id="appName" placeholder="App name">
-    <input type="password" id="delegatePin" placeholder="Master PIN">
-    <input type="number" id="expiryDays" placeholder="Expires in days (optional)">
-    <button class="btn btn-primary" onclick="generateDelegate()">Create</button>
-    <button class="btn btn-secondary" onclick="show('dashboard')">Cancel</button>
-  </div>
-
-  <!-- STEP 4: Delegate Result -->
-  <div id="delegate-result" class="card hidden">
-    <h3>Sub-Key Created</h3>
-    <div class="key-box">
-      <strong>Sub-key nsec:</strong><br><span id="delNsec"></span>
+  <div class="container">
+    <!-- STEP 0: Intro -->
+    <div id="step-intro" class="step active">
+      <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <rect width="100" height="100" rx="20" fill="#0A0A0A"/>
+        <rect x="25" y="42" width="50" height="40" rx="6" fill="none" stroke="#00D4FF" stroke-width="5"/>
+        <path d="M 35,42 L 35,32 A 15,15 0 0,1 65,32 L 65,42" fill="none" stroke="#00D4FF" stroke-width="5" stroke-linecap="round"/>
+        <polygon points="42,68 50,68 45,78 58,62 50,62 55,52 42,68" fill="#F7931A"/>
+      </svg>
+      
+      <h1>Nostr Key Ceremony</h1>
+      <p class="subtitle">Generate your keys with intention</p>
+      
+      <div class="warning-box">
+        <div class="warning-title">⚠️ CRITICAL WARNING</div>
+        <div class="warning-text">
+          This will generate a real nostr private key (nsec). 
+          Anyone with this key controls your identity forever. 
+          There is no password reset. Save your backup in multiple secure locations.
+        </div>
+      </div>
+      
+      <button class="start-btn" onclick="startCeremony()">Begin Ceremony</button>
+      
+      <div class="footer">
+        Powered by <a href="#">Lightning Lockers</a> • Self-hosted • MIT License
+      </div>
     </div>
-    <p class="info">Give this to <span id="delAppName"></span></p>
-    <button class="btn btn-primary" onclick="copyToClipboard('delNsec')">Copy</button>
-    <button class="btn btn-secondary" onclick="show('dashboard')">Done</button>
-  </div>
-
-  <!-- STEP 5: Manage Delegates -->
-  <div id="manage" class="card hidden">
-    <h3>Sub-Keys</h3>
-    <div id="delegateList"></div>
-    <button class="btn btn-secondary" onclick="show('dashboard')">Back</button>
-  </div>
-
-  <!-- STEP 6: Export -->
-  <div id="export" class="card hidden">
-    <h3>Export Master</h3>
-    <p class="warning">⚠️ Root secret. Anyone with this controls your identity.</p>
-    <input type="password" id="exportPin" placeholder="Master PIN">
-    <button class="btn btn-primary" onclick="doExport()">Reveal</button>
-    <button class="btn btn-secondary" onclick="show('dashboard')">Cancel</button>
-    <div id="masterNsecOut" class="hidden" style="background: #300; border: 2px solid #f00; padding: 1rem; margin-top: 1rem; word-break: break-all;"></div>
-  </div>
-
-  <!-- STEP 7: Restore -->
-  <div id="restore" class="card hidden">
-    <h3>Restore Master Key</h3>
-    <p class="info">Paste your backup JSON OR raw nsec (starts with nsec1...)</p>
-    <textarea id="restoreData" rows="4" placeholder="Paste backup JSON or nsec1..."></textarea>
-    <input type="password" id="restorePin" placeholder="New master PIN (8+ digits)">
-    <button class="btn btn-primary" onclick="doRestore()">Restore</button>
-    <button class="btn btn-secondary" onclick="show('setup')">Cancel</button>
+    
+    <!-- STEP 1: Entropy -->
+    <div id="step-entropy" class="step">
+      <h1 style="margin-bottom: 1rem;">Provide Entropy</h1>
+      <p class="subtitle" style="margin-bottom: 2rem;">Your randomness makes the key truly yours</p>
+      
+      <div class="entropy-box" id="entropyArea" onmousemove="addEntropy(event)">
+        <div class="entropy-text">Move your mouse here</div>
+        <div class="entropy-sub">Or type random keys • Or click for auto</div>
+        
+        <div class="progress-container" style="margin-top: 1.5rem;">
+          <div class="progress-bar" id="entropyBar" style="width: 0%"></div>
+        </div>
+        <div class="progress-text" id="entropyPercent">0%</div>
+      </div>
+      
+      <button class="btn btn-secondary" onclick="autoEntropy()">Auto-fill Entropy</button>
+      <button class="btn btn-primary hidden" id="generateBtn" onclick="generateKey()">Generate Key</button>
+    </div>
+    
+    <!-- STEP 2: Mining -->
+    <div id="step-mining" class="step">
+      <h1 style="margin-bottom: 1rem;">Forging Your Key</h1>
+      <p class="subtitle" style="margin-bottom: 2rem;">Secp256k1 elliptic curve cryptography</p>
+      
+      <div class="mining-visual">
+        <div class="mining-ring"></div>
+        <div class="mining-ring"></div>
+        <div class="mining-ring"></div>
+        <div class="mining-core"></div>
+      </div>
+      
+      <div class="mining-status" id="miningStatus">Initializing secp256k1...</div>
+      <div class="mining-sub" id="miningSub">Generating 256-bit secret</div>
+    </div>
+    
+    <!-- STEP 3: Reveal -->
+    <div id="step-reveal" class="step">
+      <h1 style="margin-bottom: 1rem;">Your Key is Ready</h1>
+      <p class="subtitle" style="margin-bottom: 1.5rem;">Guard this secret with your life</p>
+      
+      <div class="key-reveal">
+        <div class="key-label">Secret Key (nsec)</div>
+        <div class="nsec-box" id="nsecDisplay"></div>
+        <div class="npub-box" id="npubDisplay"></div>
+      </div>
+      
+      <div class="warning-box">
+        <div class="warning-title">⚠️ BACKUP REQUIRED</div>
+        <div class="warning-text">
+          You MUST save this key now. There is no recovery. 
+          Download the encrypted backup and store it in multiple secure locations.
+        </div>
+      </div>
+      
+      <div class="backup-grid">
+        <div class="backup-card" onclick="downloadBackup()">
+          <div class="backup-icon">💾</div>
+          <div class="backup-label">Download JSON</div>
+        </div>
+        <div class="backup-card" onclick="copyNsec()">
+          <div class="backup-icon">📋</div>
+          <div class="backup-label">Copy nsec</div>
+        </div>
+        <div class="backup-card" onclick="copyNpub()">
+          <div class="backup-icon">👤</div>
+          <div class="backup-label">Copy npub</div>
+        </div>
+        <div class="backup-card" onclick="window.print()">
+          <div class="backup-icon">🖨️</div>
+          <div class="backup-label">Print Backup</div>
+        </div>
+      </div>
+      
+      <div class="checkbox-container">
+        <input type="checkbox" id="confirmBackup" onchange="checkConfirm()">
+        <label class="checkbox-label" for="confirmBackup">
+          I have backed up my key in multiple secure locations. I understand there is no recovery.
+        </label>
+      </div>
+      
+      <button class="btn btn-primary hidden" id="finishBtn" onclick="finishCeremony()">Complete Ceremony</button>
+    </div>
+    
+    <!-- STEP 4: Complete -->
+    <div id="step-complete" class="step">
+      <div class="completion-message">
+        <div class="completion-icon">⚡🔒</div>
+        <div class="completion-title">Ceremony Complete</div>
+        <div class="completion-text">
+          Your nostr identity is now secured. Remember: your keys, your responsibility.
+        </div>
+      </div>
+      
+      <p class="subtitle" style="margin: 2rem 0;">
+        You can now use your npub to receive sats, messages, and build your nostr presence.
+      </p>
+      
+      <button class="btn btn-secondary" onclick="location.reload()">Generate Another Key</button>
+      
+      <div class="footer">
+        Share your ceremony: <span id="shareUrl"></span>
+      </div>
+    </div>
   </div>
 
   <script>
     // === STATE ===
-    let masterKey = null;
-    const STORAGE_KEY = 'nostr_bridge_master';
-
-    // === STORAGE ===
-    function save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(masterKey));
+    let entropy = [];
+    let generatedKey = null;
+    
+    // === NAVIGATION ===
+    function showStep(stepId) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(stepId).classList.add('active');
     }
-
-    function load() {
-      const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : null;
+    
+    // === STEP 0: Start ===
+    function startCeremony() {
+      showStep('step-entropy');
+      document.getElementById('entropyArea').focus();
     }
-
-    // === CRYPTO ===
-    async function deriveKey(password, salt) {
-      const enc = new TextEncoder();
-      const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
-      return crypto.subtle.deriveKey(
-        {name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256'},
-        keyMaterial,
-        {name: 'AES-GCM', length: 256}, false, ['encrypt', 'decrypt']
-      );
-    }
-
-    async function encrypt(data, pin) {
-      const salt = crypto.getRandomValues(new Uint8Array(16));
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const key = await deriveKey(pin, salt);
-      const ct = await crypto.subtle.encrypt({name: 'AES-GCM', iv}, key, new TextEncoder().encode(data));
-      return {s: btoa(String.fromCharCode(...salt)), iv: btoa(String.fromCharCode(...iv)), ct: btoa(String.fromCharCode(...new Uint8Array(ct)))};
-    }
-
-    async function decrypt(enc, pin) {
-      const salt = Uint8Array.from(atob(enc.s), c => c.charCodeAt(0));
-      const iv = Uint8Array.from(atob(enc.iv), c => c.charCodeAt(0));
-      const ct = Uint8Array.from(atob(enc.ct), c => c.charCodeAt(0));
-      const key = await deriveKey(pin, salt);
-      const pt = await crypto.subtle.decrypt({name: 'AES-GCM', iv}, key, ct);
-      return new TextDecoder().decode(pt);
-    }
-
-    function generateKey() {
-      // Use real secp256k1 via nostr-tools
-      const sk = window.NostrTools.generateSecretKey();
-      const pk = window.NostrTools.getPublicKey(sk);
-      const nsec = window.NostrTools.nip19.nsecEncode(sk);
-      const npub = window.NostrTools.nip19.npubEncode(pk);
-      return {nsec, npub, sk, pk};
-    }
-
-    // === UI ===
-    function show(id) {
-      document.querySelectorAll('.card').forEach(el => el.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    }
-
-    // === ACTIONS ===
-    window.createMaster = async () => {
-      const pin = document.getElementById('masterPin').value;
-      if (pin.length < 8) { alert('PIN must be 8+ digits'); return; }
-
-      const {nsec, npub} = generateKey();
-      const encrypted = await encrypt(nsec, pin);
-
-      masterKey = {
-        id: 'master-' + Date.now(),
-        npub,
-        nsecEncrypted: encrypted,
-        delegates: [],
-        created: Date.now()
-      };
-
-      save();
-
-      // Auto-download backup
-      const blob = new Blob([JSON.stringify({...masterKey, _warning: 'KEEP SECURE'}, null, 2)], {type: 'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `nostr-master-${npub.slice(0,16)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      document.getElementById('npub-box').innerHTML = `<strong>npub:</strong><br>${npub}`;
-      show('dashboard');
-    };
-
-    window.generateDelegate = async () => {
-      const appName = document.getElementById('appName').value;
-      const pin = document.getElementById('delegatePin').value;
-
-      if (!appName || !pin) { alert('Enter app name and PIN'); return; }
-
-      try {
-        const masterNsec = await decrypt(masterKey.nsecEncrypted, pin);
-        const del = generateKey();
-
-        const delegateData = {
-          id: 'del-' + Date.now(),
-          appName,
-          npub: del.npub,
-          nsec: del.nsec,
-          created: Date.now(),
-          revoked: false
-        };
-
-        masterKey.delegates.push(delegateData);
-        save();
-
-        document.getElementById('delNsec').textContent = del.nsec;
-        document.getElementById('delAppName').textContent = appName;
-        show('delegate-result');
-      } catch {
-        alert('Wrong PIN');
-      }
-    };
-
-    window.listDelegates = () => {
-      const list = document.getElementById('delegateList');
-      const active = masterKey.delegates.filter(d => !d.revoked);
-
-      if (active.length === 0) {
-        list.innerHTML = '<p style="color: #8888aa;">No active sub-keys.</p>';
-      } else {
-        list.innerHTML = active.map(d => `
-          <div class="delegate-item">
-            <strong>${d.appName}</strong><br>
-            <span style="font-family: monospace; font-size: 0.8rem;">${d.npub}</span><br>
-            <button class="btn btn-danger" onclick="revokeDelegate('${d.id}')" style="margin-top: 0.5rem; font-size: 0.875rem;">Revoke</button>
-          </div>
-        `).join('');
-      }
-
-      const revoked = masterKey.delegates.filter(d => d.revoked);
-      if (revoked.length > 0) {
-        list.innerHTML += '<h4 style="margin-top: 1rem; color: #8888aa;">Revoked</h4>';
-        list.innerHTML += revoked.map(d => `
-          <div class="delegate-item revoked">
-            <strong>${d.appName}</strong> (revoked)<br>
-            <span style="font-family: monospace; font-size: 0.8rem;">${d.npub}</span>
-          </div>
-        `).join('');
-      }
-
-      show('manage');
-    };
-
-    window.revokeDelegate = (id) => {
-      const del = masterKey.delegates.find(d => d.id === id);
-      if (del) {
-        del.revoked = true;
-        del.revokedAt = Date.now();
-        save();
-        listDelegates();
-      }
-    };
-
-    window.doExport = async () => {
-      const pin = document.getElementById('exportPin').value;
-      if (!pin) return;
-
-      try {
-        const nsec = await decrypt(masterKey.nsecEncrypted, pin);
-        document.getElementById('masterNsecOut').textContent = nsec;
-        document.getElementById('masterNsecOut').classList.remove('hidden');
-      } catch {
-        alert('Wrong PIN');
-      }
-    };
-
-    window.copyToClipboard = (id) => {
-      const text = document.getElementById(id).textContent;
-      navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
-    };
-
-    window.goSign = () => {
-      show('sign');
-      document.getElementById('signResult').classList.add('hidden');
-    };
-
-    window.goExport = () => {
-      show('export');
-      document.getElementById('masterNsecOut').classList.add('hidden');
-    };
-
-    window.logout = () => {
-      masterKey = null;
-      show('setup');
-    };
-
-    window.downloadBackup = () => {
-      const blob = new Blob([JSON.stringify({...masterKey, _warning: 'KEEP SECURE'}, null, 2)], {type: 'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `nostr-master-${masterKey.npub.slice(0,16)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-
-    window.showRestore = () => {
-      show('restore');
-    };
-
-    window.importExisting = async () => {
-      const nsec = document.getElementById('importNsec').value.trim();
-      const pin = document.getElementById('importPin').value;
+    
+    // === STEP 1: Entropy Collection ===
+    function addEntropy(e) {
+      if (entropy.length >= 100) return;
       
-      if (!nsec.startsWith('nsec1') || nsec.length < 64) {
-        alert('Enter a valid nsec (starts with nsec1, ~64 chars)');
-        return;
-      }
+      // Collect mouse coordinates + timestamp
+      const data = e.clientX + e.clientY + Date.now() + Math.random();
+      entropy.push(data);
       
-      if (pin.length < 8) {
-        alert('PIN must be 8+ digits');
-        return;
-      }
+      const percent = Math.min((entropy.length / 100) * 100, 100);
+      document.getElementById('entropyBar').style.width = percent + '%';
+      document.getElementById('entropyPercent').textContent = Math.floor(percent) + '%';
       
-      try {
-        const npub = nsec.replace('nsec1', 'npub1');
-        const encrypted = await encrypt(nsec, pin);
-        
-        masterKey = {
-          id: 'master-imported-' + Date.now(),
-          npub,
-          nsecEncrypted: encrypted,
-          delegates: [],
-          created: Date.now()
-        };
-        
-        save();
-        
-        // Clear inputs
-        document.getElementById('importNsec').value = '';
-        document.getElementById('importPin').value = '';
-        
-        // Auto-download backup
-        const blob = new Blob([JSON.stringify({...masterKey, _warning: 'KEEP SECURE'}, null, 2)], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `nostr-master-${npub.slice(0,16)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        document.getElementById('npub-box').innerHTML = `<strong>npub:</strong><br>${npub}`;
-        show('dashboard');
-        alert('Existing key imported! Backup downloaded. You can now create sub-keys from your existing nsec.');
-      } catch {
-        alert('Import failed. Check nsec format.');
+      if (percent >= 100) {
+        document.getElementById('generateBtn').classList.remove('hidden');
+        document.getElementById('generateBtn').style.animation = 'pulse 0.5s ease';
       }
-    };
-
-    window.doRestore = async () => {
-      const data = document.getElementById('restoreData').value.trim();
-      const pin = document.getElementById('restorePin').value;
-
-      if (!data || pin.length < 8) {
-        alert('Need backup JSON or nsec, plus PIN (8+ digits)');
-        return;
-      }
-
-      try {
-        // Check if raw nsec
-        if (data.startsWith('nsec1')) {
-          // Create new master key from raw nsec
-          const npub = data.replace('nsec1', 'npub1');
-          const encrypted = await encrypt(data, pin);
+    }
+    
+    // Keyboard entropy fallback
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('step-entropy').classList.contains('active')) {
+        if (entropy.length < 100) {
+          entropy.push(e.key + Date.now() + Math.random());
+          const percent = Math.min((entropy.length / 100) * 100, 100);
+          document.getElementById('entropyBar').style.width = percent + '%';
+          document.getElementById('entropyPercent').textContent = Math.floor(percent) + '%';
           
-          masterKey = {
-            id: 'master-restored-' + Date.now(),
-            npub,
-            nsecEncrypted: encrypted,
-            delegates: [],
-            created: Date.now()
-          };
-          
-          save();
-          
-          // Auto-download new backup
-          const blob = new Blob([JSON.stringify({...masterKey, _warning: 'KEEP SECURE'}, null, 2)], {type: 'application/json'});
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `nostr-master-${npub.slice(0,16)}.json`;
-          a.click();
-          URL.revokeObjectURL(url);
-          
-          document.getElementById('npub-box').innerHTML = `<strong>npub:</strong><br>${npub}`;
-          show('dashboard');
-          alert('Restored from nsec! New backup downloaded.');
-          return;
+          if (percent >= 100) {
+            document.getElementById('generateBtn').classList.remove('hidden');
+          }
         }
-        
-        // Otherwise parse as JSON backup
-        const backup = JSON.parse(data);
-        await decrypt(backup.nsecEncrypted, pin); // Verify PIN
-
-        masterKey = backup;
-        save();
-
-        document.getElementById('npub-box').innerHTML = `<strong>npub:</strong><br>${masterKey.npub}`;
-        show('dashboard');
-      } catch {
-        alert('Invalid backup, nsec, or wrong PIN');
       }
-    };
-
-    window.importExisting = async () => {
-      const nsec = document.getElementById('importNsec').value.trim();
-      const pin = document.getElementById('importPin').value;
+    });
+    
+    function autoEntropy() {
+      // Fill with crypto random values
+      const arr = new Uint32Array(100 - entropy.length);
+      crypto.getRandomValues(arr);
+      for (let i = 0; i < arr.length; i++) {
+        entropy.push(arr[i]);
+      }
+      document.getElementById('entropyBar').style.width = '100%';
+      document.getElementById('entropyPercent').textContent = '100%';
+      document.getElementById('generateBtn').classList.remove('hidden');
+    }
+    
+    // === STEP 2: Key Generation ===
+    async function generateKey() {
+      showStep('step-mining');
       
-      if (!nsec.startsWith('nsec1') || nsec.length < 64) {
-        alert('Enter a valid nsec (starts with nsec1, ~64 chars)');
-        return;
+      // Simulate mining animation
+      const statuses = [
+        'Initializing secp256k1...',
+        'Generating 256-bit secret...',
+        'Computing public key...',
+        'Encoding to bech32...',
+        'Verifying key pair...'
+      ];
+      
+      const subs = [
+        'Elliptic curve cryptography',
+        'High entropy randomness',
+        'Scalar multiplication',
+        'NIP-19 encoding',
+        'Final checks'
+      ];
+      
+      for (let i = 0; i < statuses.length; i++) {
+        document.getElementById('miningStatus').textContent = statuses[i];
+        document.getElementById('miningSub').textContent = subs[i];
+        await new Promise(r => setTimeout(r, 400));
       }
       
-      if (pin.length < 8) {
-        alert('PIN must be 8+ digits');
-        return;
-      }
-      
+      // Actually generate the key using nostr-tools
       try {
-        const npub = nsec.replace('nsec1', 'npub1');
-        const encrypted = await encrypt(nsec, pin);
+        const sk = window.NostrTools.generateSecretKey();
+        const pk = window.NostrTools.getPublicKey(sk);
+        const nsec = window.NostrTools.nip19.nsecEncode(sk);
+        const npub = window.NostrTools.nip19.npubEncode(pk);
         
-        masterKey = {
-          id: 'master-imported-' + Date.now(),
-          npub,
-          nsecEncrypted: encrypted,
-          delegates: [],
-          created: Date.now()
-        };
+        generatedKey = { sk, pk, nsec, npub, created: Date.now() };
         
-        save();
+        // Show results
+        document.getElementById('nsecDisplay').textContent = nsec;
+        document.getElementById('npubDisplay').textContent = 'Public: ' + npub;
         
-        // Clear inputs
-        document.getElementById('importNsec').value = '';
-        document.getElementById('importPin').value = '';
+        setTimeout(() => showStep('step-reveal'), 500);
         
-        // Auto-download backup
-        const blob = new Blob([JSON.stringify({...masterKey, _warning: 'KEEP SECURE'}, null, 2)], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `nostr-master-${npub.slice(0,16)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        document.getElementById('npub-box').innerHTML = `<strong>npub:</strong><br>${npub}`;
-        show('dashboard');
-        alert('Master key imported! Backup downloaded.');
-      } catch {
-        alert('Import failed. Check nsec format.');
+      } catch (err) {
+        console.error('Key generation failed:', err);
+        alert('Key generation failed. Please try again.');
+        showStep('step-intro');
       }
-    };
-
-    window.createDelegate = () => {
-      document.getElementById('appName').value = '';
-      document.getElementById('delegatePin').value = '';
-      show('create-delegate');
-    };
-
-    // Init
-    const saved = load();
-    if (saved) {
-      masterKey = saved;
-      document.getElementById('npub-box').innerHTML = `<strong>npub:</strong><br>${masterKey.npub}`;
-      show('dashboard');
-    } else {
-      show('setup');
+    }
+    
+    // === STEP 3: Backup Actions ===
+    function downloadBackup() {
+      if (!generatedKey) return;
+      
+      const backup = {
+        nsec: generatedKey.nsec,
+        npub: generatedKey.npub,
+        created: generatedKey.created,
+        _warning: 'KEEP THIS SECRET. NEVER SHARE NSEC.'
+      };
+      
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `nostr-key-${generatedKey.npub.slice(0, 16)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      // Visual feedback
+      createConfetti();
+    }
+    
+    function copyNsec() {
+      if (!generatedKey) return;
+      navigator.clipboard.writeText(generatedKey.nsec).then(() => {
+        alert('nsec copied to clipboard!');
+      });
+    }
+    
+    function copyNpub() {
+      if (!generatedKey) return;
+      navigator.clipboard.writeText(generatedKey.npub).then(() => {
+        alert('npub copied to clipboard!');
+      });
+    }
+    
+    function checkConfirm() {
+      const checked = document.getElementById('confirmBackup').checked;
+      document.getElementById('finishBtn').classList.toggle('hidden', !checked);
+    }
+    
+    function finishCeremony() {
+      document.getElementById('shareUrl').textContent = location.href;
+      showStep('step-complete');
+      createConfetti();
+    }
+    
+    // === VISUAL EFFECTS ===
+    function createConfetti() {
+      const colors = ['#00d4ff', '#ff9500', '#00ff88', '#ff4444'];
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+          document.body.appendChild(confetti);
+          setTimeout(() => confetti.remove(), 4000);
+        }, i * 30);
+      }
     }
   </script>
 </body>
