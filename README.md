@@ -81,7 +81,7 @@ Your nsec appears with ritual solemnity. Download encrypted backup (with passwor
 Never expose your nsec to apps again. Use these bunkers:
 
 - **[nsecBunker.com](https://nsecbunker.com)** — Hosted bunker service
-- **[Nostr Connect](https://github.com/nostr-connect/nostr-connect)** — Protocol spec
+- **[NIP-46](https://github.com/nostr-protocol/nips/blob/master/46.md)** — Protocol spec
 - **[Blowater](https://github.com/fiatjaf/blowater)** — Self-hosted option
 
 ---
