@@ -82,7 +82,7 @@ Never expose your nsec to apps again. Use these bunkers:
 
 - **[nsecBunker.com](https://nsecbunker.com)** — Hosted bunker service
 - **[Nostr Connect](https://github.com/nostr-connect/nostr-connect)** — Protocol spec
-- **[Blowater](https://git.njump.io/fiatjaf/blowater)** — Self-hosted option
+- **[Blowater](https://github.com/fiatjaf/blowater)** — Self-hosted option
 
 ---
 
