@@ -1,0 +1,17 @@
+{
+  "name": "nostr-key-bridge-pwa",
+  "version": "0.1.0",
+  "description": "Serverless OAuth to encrypted nsec PWA",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8080 --directory public",
+    "serve": "npx serve public -p 8080",
+    "build": "echo 'No build needed - vanilla JS'",
+    "test": "echo 'No tests yet'"
+  },
+  "keywords": ["nostr", "oauth", "crypto", "pwa"],
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}
